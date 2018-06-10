@@ -3,10 +3,70 @@ teamData = []
 var canvasValues = d3.select("#Values")
 var canvasDesc = d3.select("#Desc")
 
-var margin = {top:50, bottom:50, left:60, right:60}
+var margin = {top:50, bottom:50, left:60, right:100}
 var widthValues = Values.width.baseVal.value - margin.left - margin.right
 var heightValues = Values.height.baseVal.value - margin.bottom - margin.top
 
+var years = [0,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017]
+var isChecked = [1,1,1,1,1,1,1,1,1,1,1]
+
+var checkBoxCountour = canvasValues.append("rect")
+                                    .attr("x", Values.width.baseVal.value - margin.right - margin.left + 25)
+                                    .attr("y", margin.top + 5)
+                                    .attr("width", 120)
+                                    .attr("height", 205)
+                                    .attr("stroke", "black")
+                                    .attr("stroke-width", 1)
+                                    .attr("fill", "transparent")
+
+function updateIsChecked(index){
+
+  if(index==0) {
+    if (isChecked[0]==0) {
+      for (var i = 0; i < isChecked.length; i++) {
+        isChecked[i] = 1
+      }
+    }
+    else {
+      for (var i = 0; i < isChecked.length; i++) {
+        isChecked[i] = 0
+      }
+    }
+  }
+  else{
+
+    if (isChecked[index] == 0) isChecked[index] = 1
+
+    else {
+      isChecked[index] = 0
+      isChecked[0] = 0
+    }
+
+    cond = 1
+    for (var i = 1; i < isChecked.length; i++) {
+      if(isChecked[i] == 0) {
+        isChecked[0] = 0
+        cond = 0
+        break
+      }
+    }
+
+    if(cond==1){
+      isChecked[0] = 1
+    }
+  }
+
+}
+function updatePlot(){
+  console.log("chamou")
+  canvasValues.select("#teamsGroup").selectAll("circle").data(valuesPositions)
+              .attr("opacity", function(d,index){
+                if (isChecked[Math.floor(index/20) + 1] == 1){
+                  return 1
+                }
+                else return 0
+              })
+}
 
 d3.csv("brasileirao.csv", function(csv) {
   teamData = csv
@@ -63,9 +123,9 @@ d3.csv("brasileirao.csv", function(csv) {
                                  .attr("cy", function (d) { return yScaleValues(d[1]); })
                                  .attr("r", 6)
                                  .attr("stroke", "black")
-                                 .attr("stroke-width", 0.5)
-                                 .attr("opacity", 0.8)
-                                 .attr("fill", "blue")
+                                 .attr("stroke-width", 1)
+                                 .attr("opacity", 0.9)
+                                 .attr("fill", d3.rgb(100, 200, 240))
                                  .on("mouseover",function(d, index){
                                    canvasValues.append("text")
                                                 .attr("x", xScaleValues(d[0]))
@@ -80,5 +140,37 @@ d3.csv("brasileirao.csv", function(csv) {
                                  .on("mouseout",function(){
                                    d3.select("#thisName").remove();
                                  })
+
+  var checkBoxGroup = canvasValues.append("g").attr("id", "checkBoxGroup")
+
+  var checkBoxValues = canvasValues.select("#checkBoxGroup").selectAll("foreignObject").data(years).enter()
+        .append("foreignObject")
+        .attr("width", 100)
+        .attr("height", 100)
+        .attr("x", Values.width.baseVal.value - margin.right - margin.left + 20)
+        .attr("y", function(d,index){return (index*18)+margin.top;})
+        .property("checked", true)
+        .append("xhtml:body")
+        .html("<form><input type=checkbox checked=true id=check /></form>")
+        .on("click", function(d, index){
+          updateIsChecked(index)
+          updatePlot()
+        });
+
+  var checkTextGroup = canvasValues.append("g").attr("id", "checkTextGroup")
+
+  var checkBoxValues = canvasValues.select("#checkTextGroup").selectAll("text").data(years).enter()
+        .append("text")
+        .attr("x", Values.width.baseVal.value - margin.right - margin.left + 50)
+        .attr("y", function(d,index){return ((index+1)*18)+margin.top + 5;})
+        .text(function(d, index){
+          if(index == 0){
+            return "All (not 100%)"
+          }
+          else return years[index]
+        })
+        .style("fill", "black")
+        .attr("font-size", "14px")
+        .attr("font-weight", "bold")
 
 });
