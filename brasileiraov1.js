@@ -23,11 +23,13 @@ function updateIsChecked(index){
 
   if(index==0) {
     if (isChecked[0]==0) {
+      canvasValues.select("#checkBoxGroup").selectAll('input').property('checked', true);
       for (var i = 0; i < isChecked.length; i++) {
         isChecked[i] = 1
       }
     }
     else {
+      canvasValues.select("#checkBoxGroup").selectAll('input').property('checked', false);
       for (var i = 0; i < isChecked.length; i++) {
         isChecked[i] = 0
       }
@@ -40,6 +42,7 @@ function updateIsChecked(index){
     else {
       isChecked[index] = 0
       isChecked[0] = 0
+      canvasValues.select("#checkBoxGroup").select('input').property('checked', false);
     }
 
     cond = 1
@@ -53,18 +56,24 @@ function updateIsChecked(index){
 
     if(cond==1){
       isChecked[0] = 1
+      canvasValues.select("#checkBoxGroup").select('input').property('checked', true);
     }
   }
 
 }
 function updatePlot(){
-  console.log("chamou")
   canvasValues.select("#teamsGroup").selectAll("circle").data(valuesPositions)
               .attr("opacity", function(d,index){
                 if (isChecked[Math.floor(index/20) + 1] == 1){
                   return 1
                 }
-                else return 0
+                else return 0.1
+              })
+              .attr("stroke-width", function(d,index){
+                if (isChecked[Math.floor(index/20) + 1] == 1){
+                  return 1.5
+                }
+                else return 0.5
               })
 }
 
@@ -110,6 +119,31 @@ d3.csv("brasileirao.csv", function(csv) {
               .attr("transform","translate("+ margin.left+",0)")
               .call(yAxisValues);
 
+
+  var zoneGroup = canvasValues.append("g").attr("id", "zoneGroup")
+
+  var zones = [4,12,17,20]
+
+  var zoneBars = canvasValues.select("#zoneGroup").selectAll("rect").data(zones).enter()
+                              .append("rect")
+                              .attr("x", margin.left)
+                              .attr("y", function(d, index) {
+                                if (index==0) return margin.top
+                                else return yScaleValues(zones[index-1])
+                              })
+                              .attr("width", widthValues - margin.left)
+                              .attr("height", function(d,index) {
+                                if (index==0) return yScaleValues(d) - yScaleValues(1)
+                                else return yScaleValues(d) - yScaleValues(zones[index-1])
+                              })
+                              .attr("fill", function(d,index){
+                                if (index==0) return d3.rgb(0,0,102)
+                                else if (index==1) return d3.rgb(51,204,51)
+                                else if (index==2) return d3.rgb(255,255,255)
+                                else return d3.rgb(179,36,0)
+                              })
+                              .attr("opacity", 0.15)
+
   var teamsGroup = canvasValues.append("g").attr("id", "teamsGroup")
 
   valuesPositions = []
@@ -123,7 +157,7 @@ d3.csv("brasileirao.csv", function(csv) {
                                  .attr("cy", function (d) { return yScaleValues(d[1]); })
                                  .attr("r", 6)
                                  .attr("stroke", "black")
-                                 .attr("stroke-width", 1)
+                                 .attr("stroke-width", 1.5)
                                  .attr("opacity", 0.9)
                                  .attr("fill", d3.rgb(100, 200, 240))
                                  .on("mouseover",function(d, index){
@@ -149,7 +183,6 @@ d3.csv("brasileirao.csv", function(csv) {
         .attr("height", 100)
         .attr("x", Values.width.baseVal.value - margin.right - margin.left + 20)
         .attr("y", function(d,index){return (index*18)+margin.top;})
-        .property("checked", true)
         .append("xhtml:body")
         .html("<form><input type=checkbox checked=true id=check /></form>")
         .on("click", function(d, index){
@@ -159,18 +192,18 @@ d3.csv("brasileirao.csv", function(csv) {
 
   var checkTextGroup = canvasValues.append("g").attr("id", "checkTextGroup")
 
-  var checkBoxValues = canvasValues.select("#checkTextGroup").selectAll("text").data(years).enter()
-        .append("text")
-        .attr("x", Values.width.baseVal.value - margin.right - margin.left + 50)
-        .attr("y", function(d,index){return ((index+1)*18)+margin.top + 5;})
-        .text(function(d, index){
-          if(index == 0){
-            return "All (not 100%)"
-          }
-          else return years[index]
-        })
-        .style("fill", "black")
-        .attr("font-size", "14px")
-        .attr("font-weight", "bold")
+  var checkTexts = canvasValues.select("#checkTextGroup").selectAll("text").data(years).enter()
+                                .append("text")
+                                .attr("x", Values.width.baseVal.value - margin.right - margin.left + 50)
+                                .attr("y", function(d,index){return ((index+1)*18)+margin.top + 5;})
+                                .text(function(d, index){
+                                  if(index == 0){
+                                    return "All (not 100%)"
+                                  }
+                                  else return years[index]
+                                })
+                                .style("fill", "black")
+                                .attr("font-size", "14px")
+                                .attr("font-weight", "bold")
 
 });
