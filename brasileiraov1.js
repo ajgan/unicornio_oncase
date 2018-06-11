@@ -198,7 +198,7 @@ d3.csv("brasileirao.csv", function(csv) {
                                 .attr("y", function(d,index){return ((index+1)*18)+margin.top + 5;})
                                 .text(function(d, index){
                                   if(index == 0){
-                                    return "All (not 100%)"
+                                    return "Select All"
                                   }
                                   else return years[index]
                                 })
