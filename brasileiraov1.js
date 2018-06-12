@@ -1,9 +1,8 @@
 teamData = []
 
 var canvasValues = d3.select("#Values")
-var canvasDesc = d3.select("#Desc")
 
-var margin = {top:50, bottom:50, left:60, right:100}
+var margin = {top:20, bottom:60, left:60, right:100}
 var widthValues = Values.width.baseVal.value - margin.left - margin.right
 var heightValues = Values.height.baseVal.value - margin.bottom - margin.top
 
@@ -65,7 +64,7 @@ function updatePlot(){
   canvasValues.select("#teamsGroup").selectAll("circle").data(valuesPositions)
               .attr("opacity", function(d,index){
                 if (isChecked[Math.floor(index/20) + 1] == 1){
-                  return 1
+                  return 0.9
                 }
                 else return 0.1
               })
@@ -151,6 +150,8 @@ d3.csv("brasileirao.csv", function(csv) {
     valuesPositions.push([teamValue[i], teamPositions[i]])
   }
 
+  var myDescGroup = canvasValues.append("g").attr("id", "myDescGroup")
+
   var teamsCircles = canvasValues.select("#teamsGroup").selectAll("circle").data(valuesPositions).enter()
                                  .append("circle")
                                  .attr("cx", function (d) { return xScaleValues(d[0]); })
@@ -161,6 +162,7 @@ d3.csv("brasileirao.csv", function(csv) {
                                  .attr("opacity", 0.9)
                                  .attr("fill", d3.rgb(100, 200, 240))
                                  .on("mouseover",function(d, index){
+                                   d3.select(this).style("cursor", "pointer");
                                    canvasValues.append("text")
                                                 .attr("x", xScaleValues(d[0]))
                                                 .attr("y",yScaleValues(d[1]) - 8)
@@ -173,6 +175,72 @@ d3.csv("brasileirao.csv", function(csv) {
                                  })
                                  .on("mouseout",function(){
                                    d3.select("#thisName").remove();
+                                 })
+                                 .on("click", function(d,index) {
+                                    canvasValues.select("#myDescGroup").selectAll("*").remove()
+                                    canvasValues.select("#myDescGroup")
+                                                .append("rect")
+                                                .attr("x", Values.width.baseVal.value - margin.right - margin.left + 25)
+                                                .attr("y", margin.top + 220)
+                                                .attr("width", 120)
+                                                .attr("height", 170)
+                                                .attr("stroke", "black")
+                                                .attr("stroke-width", 1)
+                                                .attr("fill", "transparent")
+
+                                    canvasValues.select("#myDescGroup").append("text")
+                                                .attr("x", Values.width.baseVal.value - margin.right - margin.left + 133)
+                                                .attr("y", margin.top + 233)
+                                                .text("x")
+                                                .attr("font-size", "12px")
+                                                .attr("font-family", "Verdana")
+                                                .attr("font-weight", "bold")
+                                                .style('pointer-events', 'auto')
+                                                .on("click", function(){
+                                                  canvasValues.select("#myDescGroup").selectAll("*").remove()
+                                                })
+                                                .on("mouseover", function(d) {
+                                                      d3.select(this).style("cursor", "pointer");
+                                                })
+
+                                    canvasValues.select("#myDescGroup").append("text")
+                                                .attr("x", Values.width.baseVal.value - margin.right - margin.left + 55)
+                                                .attr("y", margin.top + 235)
+                                                .text("Descrição")
+                                                .attr("font-size", "14px")
+                                                .attr("font-weight", "bold")
+
+                                    canvasValues.select("#myDescGroup").append("text")
+                                                .attr("x", Values.width.baseVal.value - margin.right - margin.left + 30)
+                                                .attr("y", margin.top + 255)
+                                                .text(teamData[index].Equipe)
+                                                .attr("font-size", "12px")
+                                                .attr("font-weight", "bold")
+
+                                    infos = ["Tamanho do Elenco: ", "Idade Média do Time: ", "Jogadores Estrangeiros: ",
+                                            "Valor Total: ", "Valor Médio: ", "Posição: ", "Pontuação: ", "Saldo de Gol: "]
+
+                                    for (var i = 0; i < infos.length; i++) {
+                                      canvasValues.select("#myDescGroup").append("text")
+                                                  .attr("x", Values.width.baseVal.value - margin.right - margin.left + 29)
+                                                  .attr("y", margin.top + 275 + 15*i)
+                                                  .text(function() {
+                                                    myText = infos[i]
+                                                    if(i==0) myText += teamData[index].TamanhoElenco
+                                                    else if(i==1) myText+= teamData[index].IdadeElenco
+                                                    else if(i==2) myText+= teamData[index].JogadoresEstrangeiros
+                                                    else if(i==3) myText+= teamData[index].Valor + "0 €"
+                                                    else if(i==4) myText+= teamData[index].ValorMedio + "0 €"
+                                                    else if(i==5) myText+= teamData[index].Pos
+                                                    else if(i==6) myText+= teamData[index].Pts
+                                                    else if(i==7) myText+= teamData[index].SG
+
+                                                    return myText
+                                                  })
+                                                  .attr("font-size", "10px")
+                                    }
+
+
                                  })
 
   var checkBoxGroup = canvasValues.append("g").attr("id", "checkBoxGroup")
