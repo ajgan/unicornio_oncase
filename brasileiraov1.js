@@ -64,7 +64,7 @@ function updatePlot(){
   canvasValues.select("#teamsGroup").selectAll("circle").data(valuesPositions)
               .attr("opacity", function(d,index){
                 if (isChecked[Math.floor(index/20) + 1] == 1){
-                  return 0.9
+                  return 1
                 }
                 else return 0.1
               })
@@ -75,6 +75,7 @@ function updatePlot(){
                 else return 0.5
               })
 }
+
 
 d3.csv("brasileirao.csv", function(csv) {
   teamData = csv
@@ -159,7 +160,7 @@ d3.csv("brasileirao.csv", function(csv) {
                                  .attr("r", 6)
                                  .attr("stroke", "black")
                                  .attr("stroke-width", 1.5)
-                                 .attr("opacity", 0.9)
+                                 .attr("opacity", 1)
                                  .attr("fill", d3.rgb(100, 200, 240))
                                  .on("mouseover",function(d, index){
                                    d3.select(this).style("cursor", "pointer");
@@ -211,7 +212,7 @@ d3.csv("brasileirao.csv", function(csv) {
                                                 .attr("font-weight", "bold")
 
                                     canvasValues.select("#myDescGroup").append("text")
-                                                .attr("x", Values.width.baseVal.value - margin.right - margin.left + 30)
+                                                .attr("x", Values.width.baseVal.value - margin.right - margin.left + 29)
                                                 .attr("y", margin.top + 255)
                                                 .text(teamData[index].Equipe)
                                                 .attr("font-size", "12px")
@@ -256,6 +257,7 @@ d3.csv("brasileirao.csv", function(csv) {
         .on("click", function(d, index){
           updateIsChecked(index)
           updatePlot()
+          drawline()
         });
 
   var checkTextGroup = canvasValues.append("g").attr("id", "checkTextGroup")
@@ -273,5 +275,68 @@ d3.csv("brasileirao.csv", function(csv) {
                                 .style("fill", "black")
                                 .attr("font-size", "14px")
                                 .attr("font-weight", "bold")
+
+  var regGroup = canvasValues.append("g").attr("id", "regGroup")
+
+  function myRegression(dataX, dataY) {
+    // B1 = sum((x(i) - mean(x)) * (y(i) - mean(y))) / sum( (x(i) - mean(x))^2 )
+    // B0 = mean(y) - B1 * mean(x)
+    totalX = 0
+    totalY = 0
+
+    for (var i = 0; i < dataX.length; i++) {
+      totalX += dataX[i]
+      totalY += dataY[i]
+    }
+
+    mediaX = totalX/dataX.length
+    mediaY = totalY/dataY.length
+
+    somaValUp = 0
+    somaValDown = 0
+    for (var i = 0; i < dataX.length; i++) {
+      somaValUp += ( (dataX[i] - mediaX) * (dataY[i] - mediaY) )
+      somaValDown += ( (dataX[i] - mediaX)**2 )
+    }
+
+    coef = somaValUp/somaValDown
+
+    con = mediaY - (coef * mediaX)
+
+    return [coef, con]
+
+  }
+
+  function drawline(){
+    canvasValues.select("#regGroup").selectAll("*").remove()
+    target = canvasValues.select("#teamsGroup").selectAll("circle[opacity=\\31]")
+    targetarr = target._groups[0]
+    valuesX = []
+    valuesY = []
+
+    for (var i = 0; i < targetarr.length; i++) {
+      valuesX.push(targetarr[i].cx.baseVal.value)
+      valuesY.push(targetarr[i].cy.baseVal.value)
+    }
+
+    if(valuesX.length > 0) {
+      var myreg = myRegression(valuesX, valuesY)
+
+      canvasValues.select("#regGroup").append("line")
+    	        .attr("x1", xScaleValues(0))
+    	        .attr("y1", (myreg[0]*xScaleValues(0) + myreg[1]))
+    	        .attr("x2", xScaleValues(maxValue + 1000000))
+    	        .attr("y2", (myreg[0]*xScaleValues(maxValue + 1000000) + myreg[1]))
+              .attr("opacity", 0.5)
+              .style("stroke", "red")
+              .style("stroke-width", 4)
+    }
+
+
+
+
+  }
+
+  drawline();
 
 });
