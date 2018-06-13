@@ -61,7 +61,7 @@ function updateIsChecked(index){
 
 }
 function updatePlot(){
-  canvasValues.select("#teamsGroup").selectAll("circle").data(valuesPositions)
+  canvasValues.select("#teamsGroup").selectAll("image").data(valuesPositions)
               .attr("opacity", function(d,index){
                 if (isChecked[Math.floor(index/20) + 1] == 1){
                   return 1
@@ -153,15 +153,16 @@ d3.csv("brasileirao.csv", function(csv) {
 
   var myDescGroup = canvasValues.append("g").attr("id", "myDescGroup")
 
-  var teamsCircles = canvasValues.select("#teamsGroup").selectAll("circle").data(valuesPositions).enter()
-                                 .append("circle")
-                                 .attr("cx", function (d) { return xScaleValues(d[0]); })
-                                 .attr("cy", function (d) { return yScaleValues(d[1]); })
-                                 .attr("r", 6)
-                                 .attr("stroke", "black")
-                                 .attr("stroke-width", 1.5)
+
+  var teamsCircles = canvasValues.select("#teamsGroup").selectAll("image").data(valuesPositions).enter()
+                                 .append("image")
+                                 .attr("x", function (d) { return xScaleValues(d[0]); })
+                                 .attr("y", function (d) { return yScaleValues(d[1]); })
+                                 .attr("width", 15)
+                                 .attr("height", 15)
                                  .attr("opacity", 1)
-                                 .attr("fill", d3.rgb(100, 200, 240))
+                                 .attr("xlink:href", function (d, index) { return teamData[index].Escudo })
+                                 .attr("align", "left")
                                  .on("mouseover",function(d, index){
                                    d3.select(this).style("cursor", "pointer");
                                    canvasValues.append("text")
@@ -184,7 +185,7 @@ d3.csv("brasileirao.csv", function(csv) {
                                                 .attr("x", Values.width.baseVal.value - margin.right - margin.left + 25)
                                                 .attr("y", margin.top + 220)
                                                 .attr("width", 120)
-                                                .attr("height", 170)
+                                                .attr("height", 190)
                                                 .attr("stroke", "black")
                                                 .attr("stroke-width", 1)
                                                 .attr("fill", "transparent")
@@ -240,6 +241,27 @@ d3.csv("brasileirao.csv", function(csv) {
                                                   })
                                                   .attr("font-size", "10px")
                                     }
+
+                                    canvasValues.select("#myDescGroup").append("text")
+                                                .attr("x", Values.width.baseVal.value - margin.right - margin.left + 98)
+                                                .attr("y", margin.top + 275+ 120)
+                                                .text("Go to Page")
+                                                .attr("font-size", "10px")
+                                                .attr("fill", "#0000FF")
+                                                .attr("text-decoration", "underline")
+                                                .on("mouseover", function(d) {
+                                                      d3.select(this).style("cursor", "pointer");
+                                                      d3.select(this).attr("fill", "#FF0000")
+                                                })
+                                                .on("click", function() {
+                                                  d3.select(this).attr("fill", "#800080")
+                                                  window.open(teamData[index].Link);
+                                                })
+                                                .on("mouseout", function(d) {
+                                                      d3.select(this).attr("fill", "#0000FF")
+                                                });
+
+
 
 
                                  })
@@ -309,14 +331,14 @@ d3.csv("brasileirao.csv", function(csv) {
 
   function drawline(){
     canvasValues.select("#regGroup").selectAll("*").remove()
-    target = canvasValues.select("#teamsGroup").selectAll("circle[opacity=\\31]")
+    target = canvasValues.select("#teamsGroup").selectAll("image[opacity=\\31]")
     targetarr = target._groups[0]
     valuesX = []
     valuesY = []
 
     for (var i = 0; i < targetarr.length; i++) {
-      valuesX.push(targetarr[i].cx.baseVal.value)
-      valuesY.push(targetarr[i].cy.baseVal.value)
+      valuesX.push(targetarr[i].x.baseVal.value)
+      valuesY.push(targetarr[i].y.baseVal.value)
     }
 
     if(valuesX.length > 0) {
