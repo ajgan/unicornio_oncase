@@ -98,7 +98,7 @@ d3.csv("brasileirao.csv", function(csv) {
   minRelValue = Math.min.apply(Math, teamRelValue)
 
   var xScaleValues = d3.scaleLinear()
-                       .domain([minValue - 1000000, maxValue + 1000000])
+                       .domain([0, maxValue + 2000000])
   	                   .range([margin.left , widthValues]);
 
   var yScaleValues= d3.scaleLinear()
@@ -343,12 +343,27 @@ d3.csv("brasileirao.csv", function(csv) {
 
       canvasValues.select("#regGroup").append("line")
     	        .attr("x1", xScaleValues(0))
-    	        .attr("y1", (myreg[0]*xScaleValues(0) + myreg[1]))
-    	        .attr("x2", xScaleValues(maxValue + 1000000))
-    	        .attr("y2", (myreg[0]*xScaleValues(maxValue + 1000000) + myreg[1]))
+    	        .attr("y1", (myreg[1]))
+    	        .attr("x2", xScaleValues(maxValue + 2000000))
+    	        .attr("y2", (myreg[0]*xScaleValues(maxValue + 2000000) + myreg[1]))
               .attr("opacity", 0.5)
               .style("stroke", "red")
               .style("stroke-width", 4)
+
+    canvasValues.select("#regGroup").append("text")
+                                    .attr("x", Values.width.baseVal.value - margin.right - margin.left - 240)
+                                    .attr("y", margin.top - 3)
+                                    .text("Equação da reta de regressão: -"+
+                                    yScaleValues.invert(myreg[0]).toFixed(3)+
+                                    " x+ "+
+                                    yScaleValues.invert(myreg[1]).toFixed(3))
+                                    .attr("font-size", "12px")
+
+    canvasValues.select("#regGroup").append("text")
+                                    .attr("x", Values.width.baseVal.value - margin.right - margin.left - 115)
+                                    .attr("y", margin.top +8)
+                                    .text("(Valor de x dado em milhão)")
+                                    .attr("font-size", "9px")
     }
 
 
