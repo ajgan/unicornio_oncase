@@ -157,7 +157,7 @@ d3.csv("brasileirao.csv", function(csv) {
   var teamsCircles = canvasValues.select("#teamsGroup").selectAll("image").data(valuesPositions).enter()
                                  .append("image")
                                  .attr("x", function (d) { return xScaleValues(d[0]); })
-                                 .attr("y", function (d) { return yScaleValues(d[1]); })
+                                 .attr("y", function (d) { return yScaleValues(d[1])-yScaleValues(0.5); })
                                  .attr("width", 15)
                                  .attr("height", 15)
                                  .attr("opacity", 1)
