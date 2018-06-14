@@ -360,9 +360,9 @@ d3.csv("brasileirao.csv", function(csv) {
                                     .attr("font-size", "12px")
 
     canvasValues.select("#regGroup").append("text")
-                                    .attr("x", Values.width.baseVal.value - margin.right - margin.left - 115)
+                                    .attr("x", Values.width.baseVal.value - margin.right - margin.left - 125)
                                     .attr("y", margin.top +8)
-                                    .text("(Valor de x dado em milhão)")
+                                    .text("(Valor de x dado em 10 milhões)")
                                     .attr("font-size", "9px")
     }
 
