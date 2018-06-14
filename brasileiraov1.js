@@ -261,9 +261,6 @@ d3.csv("brasileirao.csv", function(csv) {
                                                       d3.select(this).attr("fill", "#0000FF")
                                                 });
 
-
-
-
                                  })
 
   var checkBoxGroup = canvasValues.append("g").attr("id", "checkBoxGroup")
