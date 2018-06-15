@@ -342,10 +342,26 @@ d3.csv("brasileirao.csv", function(csv) {
       var myreg = myRegression(valuesX, valuesY)
 
       canvasValues.select("#regGroup").append("line")
-    	        .attr("x1", xScaleValues(0))
+    	        .attr("x1", xScaleValues(margin.left))
     	        .attr("y1", (myreg[1]))
-    	        .attr("x2", xScaleValues(maxValue + 2000000))
-    	        .attr("y2", (myreg[0]*xScaleValues(maxValue + 2000000) + myreg[1]))
+    	        .attr("x2", function(){
+                if( (myreg[0]*xScaleValues(maxValue + 2000000 - margin.left + margin.right) + myreg[1]) < yScaleValues(1)){
+                  newValue = (yScaleValues(1) - myreg[1])/myreg[0] - margin.left + margin.right
+
+                  if(newValue > xScaleValues(maxValue + 2000000) - xScaleValues(margin.left) + xScaleValues(margin.right)){
+                    newValue = xScaleValues(maxValue + 2000000) - xScaleValues(margin.left) + xScaleValues(margin.right)
+                  }
+
+                  return newValue
+                }
+                else return xScaleValues(maxValue + 2000000) - xScaleValues(margin.left) + xScaleValues(margin.right)
+              })
+    	        .attr("y2", function(){
+                if( (myreg[0]*xScaleValues(maxValue + 2000000 - margin.left + margin.right) + myreg[1]) < yScaleValues(1)){
+                  return(yScaleValues(1))
+                }
+                else return (myreg[0]*(xScaleValues(maxValue + 200000) - xScaleValues(margin.left) + xScaleValues(margin.right)) + myreg[1])
+              })
               .attr("opacity", 0.5)
               .style("stroke", "red")
               .style("stroke-width", 4)
@@ -353,8 +369,11 @@ d3.csv("brasileirao.csv", function(csv) {
     canvasValues.select("#regGroup").append("text")
                                     .attr("x", Values.width.baseVal.value - margin.right - margin.left - 240)
                                     .attr("y", margin.top - 3)
-                                    .text("Equação da reta de regressão: -"+
-                                    yScaleValues.invert(myreg[0]).toFixed(3)+
+                                    .text("Equação da reta de regressão: "+
+                                    ((
+                                    yScaleValues.invert( myreg[0]*(xScaleValues(10000000)) - myreg[0]*xScaleValues(margin.left) + myreg[0]*xScaleValues(margin.right) )/
+                                    ( xScaleValues(10000000) - xScaleValues(margin.left) + xScaleValues(margin.right) )
+                                    )*100).toFixed(3) +
                                     " x+ "+
                                     yScaleValues.invert(myreg[1]).toFixed(3))
                                     .attr("font-size", "12px")
