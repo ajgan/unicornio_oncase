@@ -22,13 +22,16 @@ function updateIsChecked(index){
 
   if(index==0) {
     if (isChecked[0]==0) {
-      canvasValues.select("#checkBoxGroup").selectAll('input').property('checked', true);
+      canvasValues.select("#checkBoxGroup").selectAll("rect").each(function() {
+        d3.select(this).attr("checked", 1)
+      })
+
       for (var i = 0; i < isChecked.length; i++) {
         isChecked[i] = 1
       }
     }
     else {
-      canvasValues.select("#checkBoxGroup").selectAll('input').property('checked', false);
+      canvasValues.select("#checkBoxGroup").selectAll("rect").attr("checked", 0);
       for (var i = 0; i < isChecked.length; i++) {
         isChecked[i] = 0
       }
@@ -41,7 +44,7 @@ function updateIsChecked(index){
     else {
       isChecked[index] = 0
       isChecked[0] = 0
-      canvasValues.select("#checkBoxGroup").select('input').property('checked', false);
+      canvasValues.select("#checkBoxGroup").select("rect").attr("checked", 0);
     }
 
     cond = 1
@@ -55,8 +58,9 @@ function updateIsChecked(index){
 
     if(cond==1){
       isChecked[0] = 1
-      canvasValues.select("#checkBoxGroup").select('input').property('checked', true);
+      canvasValues.select("#checkBoxGroup").select('rect').attr("checked", 1);
     }
+
   }
 
 }
@@ -74,6 +78,12 @@ function updatePlot(){
                 }
                 else return 0.5
               })
+
+  canvasValues.select("#checkBoxGroup").selectAll('rect').each(function() {
+    if (d3.select(this).attr("checked") == 1) d3.select(this).attr("fill", "#89CFF0")
+    else d3.select(this).attr("fill", "white")
+
+  })
 }
 
 
@@ -265,15 +275,20 @@ d3.csv("brasileirao.csv", function(csv) {
 
   var checkBoxGroup = canvasValues.append("g").attr("id", "checkBoxGroup")
 
-  var checkBoxValues = canvasValues.select("#checkBoxGroup").selectAll("foreignObject").data(years).enter()
-        .append("foreignObject")
-        .attr("width", 100)
-        .attr("height", 100)
-        .attr("x", Values.width.baseVal.value - margin.right - margin.left + 20)
-        .attr("y", function(d,index){return (index*18)+margin.top;})
-        .append("xhtml:body")
-        .html("<form><input type=checkbox checked=true id=check /></form>")
+  var checkBoxValues = canvasValues.select("#checkBoxGroup").selectAll("rect").data(years).enter()
+        .append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("rx", 3)
+        .attr("ry", 3)
+        .attr("x", Values.width.baseVal.value - margin.right - margin.left + 35)
+        .attr("y", function(d,index){return ((index+1)*18)+margin.top - 5;})
+        .attr("fill", "#89CFF0")
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("checked", 1)
         .on("click", function(d, index){
+          d3.select(this).attr("checked", (Math.abs(d3.select(this).attr("checked") - 1)))
           updateIsChecked(index)
           updatePlot()
           drawline()
