@@ -7,7 +7,7 @@ O problema escolhido foi analisar o mercado financeiro do futebol brasileiro, en
 
 Os dados foram coletados do site [Transfermaket](http://transfermarkt.com) e as análises foram feitas em Python com auxílio da ferramenta do Jupyter Notebook. Uma das visualizações do estudo foi feita em Javascript usando D3.
 
-###### **Arquivos:**
+##### **Arquivos:**
 - **Unicornio.ipynb** - Notebook com toda a coleta e análise de dados, além de estar organizado com comentários que explicam a linha de raciocínio do problema.
 - **brasileirao.csv** - Csv com dados do Campeonato Brasileiro de 2008 até 2017.
 - **brasileiraoNE.csv** - Csv com dados financeiros e de desempenho dos clubes nordestinos que disputaram o Campeonato Brasileiro entre 2008 e 2017.
@@ -15,7 +15,7 @@ Os dados foram coletados do site [Transfermaket](http://transfermarkt.com) e as 
 - **brasileiraov1.html** - Página html onde pode ser vista a visualização interativa que é citada no Notebook.
 - **brasileiraov1.js** - Código-fonte da visualização que pode ser acessada através do html.
 
-###### **Bibliotecas Utilizadas**
+##### **Bibliotecas Utilizadas**
 - **pandas** - Uso da estrutura de DataFrames e para salvar e carregar arquivos csv.
 - **numpy** - Para alguns cálculos matemáticos no DataFrame.
 - **requests** - Para coletar as páginas web.
